@@ -2,7 +2,7 @@ rootProject.name = "KCEF"
 
 include("jcef")
 include("kcef")
-include("example")
+//include("example")
 
 pluginManagement {
     repositories {

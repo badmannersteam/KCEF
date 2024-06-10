@@ -1,12 +1,12 @@
-import com.vanniktech.maven.publish.SonatypeHost
+//import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("jvm")
     id("org.jetbrains.dokka")
-    id("com.vanniktech.maven.publish")
+//    id("com.vanniktech.maven.publish")
     id("maven-publish")
-    id("signing")
+//    id("signing")
 }
 
 dependencies {
@@ -21,7 +21,15 @@ kotlin {
     }
 }
 
-mavenPublishing {
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            from(components["java"])
+        }
+    }
+}
+
+/*mavenPublishing {
     publishToMavenCentral(host = SonatypeHost.S01, automaticRelease = true)
     signAllPublications()
     coordinates("dev.datlag", "jcef", "2025.03.23")
@@ -52,4 +60,4 @@ mavenPublishing {
             }
         }
     }
-}
+}*/
