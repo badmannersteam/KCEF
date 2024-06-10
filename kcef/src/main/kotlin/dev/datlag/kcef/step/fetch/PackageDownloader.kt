@@ -8,7 +8,7 @@ import dev.datlag.kcef.common.deleteOnExitSafely
 import dev.datlag.kcef.model.GitHubRelease
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.engine.okhttp.*
+import io.ktor.client.engine.java.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -34,7 +34,7 @@ internal data object PackageDownloader {
         progress: KCEFBuilder.InitProgress,
         bufferSize: Long
     ): File {
-        val client = HttpClient(OkHttp) {
+        val client = HttpClient(Java) {
             followRedirects = true
             install(ContentNegotiation) {
                 json(json)
@@ -107,7 +107,7 @@ internal data object PackageDownloader {
             println("Used package: $it")
         }) {
             onDownload { bytesSentTotal, contentLength ->
-                progress.downloading((bytesSentTotal.toFloat() / contentLength.toFloat()) * 100F)
+                progress.downloading((bytesSentTotal.toFloat() / (contentLength ?: Long.MAX_VALUE).toFloat()) * 100F)
             }
         }.execute { httpResponse ->
             val channel: ByteReadChannel = httpResponse.bodyAsChannel()

@@ -10,13 +10,13 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
-val ktorVersion = "2.3.4"
+val ktorVersion = "3.0.0-beta-2-eap-940"
 
 dependencies {
     api(project(":jcef"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    implementation("io.ktor:ktor-client-java:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("org.apache.commons:commons-compress:1.24.0")
