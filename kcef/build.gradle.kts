@@ -1,12 +1,12 @@
-import com.vanniktech.maven.publish.SonatypeHost
+//import com.vanniktech.maven.publish.SonatypeHost
 import java.net.URL
 
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("com.vanniktech.maven.publish")
+//    id("com.vanniktech.maven.publish")
     id("maven-publish")
-    id("signing")
+//    id("signing")
     id("org.jetbrains.dokka")
 }
 
@@ -32,7 +32,15 @@ tasks.dokkaHtmlPartial {
     }
 }
 
-mavenPublishing {
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            from(components["java"])
+        }
+    }
+}
+
+/*mavenPublishing {
     publishToMavenCentral(host = SonatypeHost.S01, automaticRelease = true)
     signAllPublications()
     coordinates("dev.datlag", "kcef", "2024.01.07.1")
@@ -64,4 +72,4 @@ mavenPublishing {
             }
         }
     }
-}
+}*/

@@ -1,11 +1,11 @@
-import com.vanniktech.maven.publish.SonatypeHost
+//import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     kotlin("jvm")
     id("org.jetbrains.dokka")
-    id("com.vanniktech.maven.publish")
+//    id("com.vanniktech.maven.publish")
     id("maven-publish")
-    id("signing")
+//    id("signing")
 }
 
 dependencies {
@@ -13,7 +13,15 @@ dependencies {
     implementation("org.jogamp.jogl:jogl-all:2.5.0")
 }
 
-mavenPublishing {
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            from(components["java"])
+        }
+    }
+}
+
+/*mavenPublishing {
     publishToMavenCentral(host = SonatypeHost.S01, automaticRelease = true)
     signAllPublications()
     coordinates("dev.datlag", "jcef", "2024.01.07.1")
@@ -44,4 +52,4 @@ mavenPublishing {
             }
         }
     }
-}
+}*/
