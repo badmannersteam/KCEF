@@ -90,7 +90,7 @@ data object KCEF {
             }
         } ?: return
 
-        currentBuilder.addAppHandler(AppHandler)
+        currentBuilder.addAppHandler(AppHandler(builder.args.toTypedArray()))
 
         val installOk = File(currentBuilder.installDir, "install.lock").existsSafely()
 
@@ -305,7 +305,7 @@ data object KCEF {
         operator fun invoke(throwable: Throwable?)
     }
 
-    private data object AppHandler : CefAppHandlerAdapter(emptyArray()) {
+    private class AppHandler(args: Array<String>) : CefAppHandlerAdapter(args) {
 
         override fun onContextInitialized() {
             super.onContextInitialized()

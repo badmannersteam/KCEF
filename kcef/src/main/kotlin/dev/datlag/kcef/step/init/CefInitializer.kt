@@ -67,7 +67,7 @@ internal data object CefInitializer {
         }
         loadLibrary(installDir, "libcef")
         return CefApp.getInstanceIfAny() ?: scopeCatching {
-            CefApp.getInstance(cefSettings)
+            CefApp.getInstance(cefArgs.toTypedArray(), cefSettings)
         }.getOrNull() ?: CefApp.getInstance()
     }
 
