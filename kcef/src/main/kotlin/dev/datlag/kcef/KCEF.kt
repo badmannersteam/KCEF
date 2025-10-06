@@ -93,7 +93,7 @@ data object KCEF {
             }
         } ?: return
 
-        CefApp.addAppHandler(currentBuilder.appHandler ?: AppHandler())
+        CefApp.addAppHandler(currentBuilder.appHandler ?: AppHandler(builder.args.toTypedArray()))
 
         currentBuilder.initFromRuntime()?.let {
             setInitResult(Result.success(it))

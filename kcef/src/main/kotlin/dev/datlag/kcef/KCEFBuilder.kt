@@ -1,10 +1,14 @@
 package dev.datlag.kcef
 
 import com.jetbrains.cef.JCefAppConfig
-import dev.datlag.kcef.KCEFBuilder.InitProgress.Builder.NoProgressCallback
-import dev.datlag.kcef.KCEFBuilder.InitProgress.Builder.ProgressCallback
-import dev.datlag.kcef.KCEFBuilder.Settings
-import dev.datlag.kcef.common.*
+import dev.datlag.kcef.common.createSafely
+import dev.datlag.kcef.common.deleteDir
+import dev.datlag.kcef.common.existsSafely
+import dev.datlag.kcef.common.mkdirsSafely
+import dev.datlag.kcef.common.scopeCatching
+import dev.datlag.kcef.common.systemLoadLibrary
+import dev.datlag.kcef.common.systemProperty
+import dev.datlag.kcef.common.unquarantine
 import dev.datlag.kcef.model.GitHubRelease
 import dev.datlag.kcef.step.extract.TarGzExtractor
 import dev.datlag.kcef.step.fetch.PackageDownloader
@@ -34,13 +38,17 @@ class KCEFBuilder {
     internal var installDir: File = File("jcef-bundle")
     private var progress: InitProgress = InitProgress.Builder().build()
 
-    internal var settings: Settings = scopeCatching {
-        Settings.fromJcefSettings(JCefAppConfig.getInstance().cefSettings)
-    }.getOrNull() ?: Settings()
+    internal val settings: Settings by lazy {
+        scopeCatching {
+            Settings.fromJcefSettings(JCefAppConfig.getInstance(installDir.absolutePath).cefSettings)
+        }.getOrNull() ?: Settings()
+    }
 
-    internal var args: MutableList<String> = scopeCatching {
-        JCefAppConfig.getInstance().appArgsAsList.filterNotNull().toMutableList()
-    }.getOrNull() ?: mutableListOf()
+    internal val args: MutableList<String> by lazy {
+        scopeCatching {
+            JCefAppConfig.getInstance(installDir.absolutePath).appArgsAsList.filterNotNull().toMutableList()
+        }.getOrNull() ?: mutableListOf()
+    }
 
     private var download: Download = Download.Builder().github().build()
     private var extractBufferSize: Long = 4096
@@ -84,19 +92,10 @@ class KCEFBuilder {
     /**
      * Specify the Settings to create the Cef instance.
      *
-     * @param settings a [Settings] to use
-     */
-    fun settings(settings: Settings) = apply {
-        this.settings = settings
-    }
-
-    /**
-     * Specify the Settings to create the Cef instance.
-     *
      * @param builder a builder method to edit/create [Settings] to use
      */
     fun settings(builder: Settings.() -> Unit) = apply {
-        this.settings = settings.apply(builder)
+        settings.apply(builder)
     }
 
     /**
@@ -561,9 +560,7 @@ class KCEFBuilder {
          */
         var windowlessRenderingEnabled: Boolean = false,
 
-        var noSandbox: Boolean = scopeCatching {
-            JCefAppConfig.getInstance().cefSettings.no_sandbox
-        }.getOrNull() ?: CefSettings().no_sandbox
+        var noSandbox: Boolean = CefSettings().no_sandbox
     ) {
         /**
          * The log severity. Only messages of this severity level or higher will be
