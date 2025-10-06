@@ -49,4 +49,10 @@ allprojects {
             "--add-exports", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED"
         ))
     }
+
+    tasks.withType<JavaCompile> {
+        doFirst {
+            delete("$rootDir/jcef/src/main/java/module-info.java")
+        }
+    }
 }
