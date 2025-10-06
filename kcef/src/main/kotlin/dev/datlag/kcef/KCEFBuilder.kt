@@ -1,14 +1,17 @@
 package dev.datlag.kcef
 
 import com.jetbrains.cef.JCefAppConfig
+import dev.datlag.kcef.common.canReadSafely
 import dev.datlag.kcef.common.createSafely
 import dev.datlag.kcef.common.deleteDir
 import dev.datlag.kcef.common.existsSafely
 import dev.datlag.kcef.common.mkdirsSafely
+import dev.datlag.kcef.common.readSafely
 import dev.datlag.kcef.common.scopeCatching
 import dev.datlag.kcef.common.systemLoadLibrary
 import dev.datlag.kcef.common.systemProperty
 import dev.datlag.kcef.common.unquarantine
+import dev.datlag.kcef.common.writeSafely
 import dev.datlag.kcef.model.GitHubRelease
 import dev.datlag.kcef.step.extract.TarGzExtractor
 import dev.datlag.kcef.step.fetch.PackageDownloader
@@ -213,8 +216,7 @@ class KCEFBuilder {
         }
 
         this.progress.locating()
-        val installOk = File(installDir, "install.lock").existsSafely()
-        if (!installOk) {
+        if (!isInstalled()) {
             installDir.deleteDir()
 
             if (!this.installDir.mkdirsSafely()) {
@@ -243,11 +245,18 @@ class KCEFBuilder {
                 this.installDir.unquarantine()
             }
 
-            if (!File(this.installDir, "install.lock").createSafely()) {
+            val lockCreated = File(this.installDir, "install.lock").let {
+                it.createSafely() && it.writeSafely(download.url.toString())
+            }
+            if (!lockCreated) {
                 throw KCEFException.InstallationLock
             }
         }
         this.installed = true
+    }
+
+    internal fun isInstalled(): Boolean = File(installDir, "install.lock").let {
+        it.existsSafely() && it.readSafely() == download.url.toString()
     }
 
     @Throws(KCEFException::class)

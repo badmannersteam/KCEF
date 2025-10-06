@@ -44,11 +44,29 @@ internal fun File.canReadSafely(): Boolean {
     }.getOrNull() ?: false
 }
 
+internal fun File.readSafely(): String? {
+    return scopeCatching {
+        Files.readString(this.toPath(), Charsets.UTF_8)
+    }.getOrNull() ?: scopeCatching {
+        this.readText(Charsets.UTF_8)
+    }.getOrNull()
+}
+
 internal fun File.canWriteSafely(): Boolean {
     return scopeCatching {
         Files.isWritable(this.toPath())
     }.getOrNull() ?: scopeCatching {
         this.canWrite()
+    }.getOrNull() ?: false
+}
+
+internal fun File.writeSafely(text: String): Boolean {
+    return scopeCatching {
+        Files.writeString(this.toPath(), text, Charsets.UTF_8)
+        this.readSafely() == text
+    }.getOrNull() ?: scopeCatching {
+        this.writeText(text, Charsets.UTF_8)
+        this.readSafely() == text
     }.getOrNull() ?: false
 }
 

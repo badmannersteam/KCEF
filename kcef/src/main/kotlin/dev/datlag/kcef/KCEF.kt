@@ -100,9 +100,7 @@ data object KCEF {
             return
         }
 
-        val installOk = File(currentBuilder.installDir, "install.lock").existsSafely()
-
-        if (installOk) {
+        if (currentBuilder.isInstalled()) {
             val result = suspendCatching {
                 currentBuilder.build()
             }
